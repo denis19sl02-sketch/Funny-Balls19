@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Простой Банк - Без Кошельков</title>
+  <style>
+    body { 
+      font-family: Arial; 
+      text-align: center; 
+      background: #111; 
+      color: white; 
+      padding: 40px; 
+    }
+    input, button { 
+      padding: 15px; 
+      margin: 10px; 
+      font-size: 18px; 
+      width: 300px; 
+    }
+    button { 
+      background: #00ff00; 
+      color: black; 
+      border: none; 
+      cursor: pointer; 
+    }
+    #list { 
+      margin: 30px auto; 
+      max-width: 500px; 
+      text-align: left; 
+    }
+    .item { 
+      background: #222; 
+      padding: 12px; 
+      margin: 8px 0; 
+      border-radius: 8px; 
+      font-size: 18px; 
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Мой Простой Крипто-Банк</h1>
+  <p>Введи имя и нажми кнопку — оно сохранится в списке</p>
+
+  <input type="text" id="nameInput" placeholder="Введи своё имя">
+  <button id="saveBtn">Сохранить имя</button>
+
+  <h2>Список пользователей:</h2>
+  <div id="list"></div>
+
+  <script>
+    // Загружаем список из localStorage при открытии страницы
+    function loadList() {
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+
+      const saved = localStorage.getItem('profiles');
+      if (saved) {
+        const names = JSON.parse(saved);
+        names.forEach(name => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.textContent = '👤 ' + name;
+          list.appendChild(div);
+        });
+      }
+    }
+
+    // Сохраняем имя
+    function saveName() {
+      const input = document.getElementById('nameInput');
+      const name = input.value.trim();
+
+      if (!name) {
+        alert("Напиши имя!");
+        return;
+      }
+
+      // Загружаем текущий список
+      let names = [];
+      const saved = localStorage.getItem('profiles');
+      if (saved) names = JSON.parse(saved);
+
+      // Добавляем новое имя
+      names.push(name);
+
+      // Сохраняем обратно в localStorage
+      localStorage.setItem('profiles', JSON.stringify(names));
+
+      // Показываем сообщение
+      alert('Имя "' + name + '" сохранено!');
+
+      // Очищаем поле и обновляем список
+      input.value = '';
+      loadList();
+    }
+
+    // Запуск при загрузке страницы
+    window.onload = () => {
+      loadList();
+      document.getElementById('saveBtn').addEventListener('click', saveName);
+    };
+  </script>
+
+</body>
+</html>
