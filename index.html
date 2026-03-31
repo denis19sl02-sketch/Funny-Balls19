@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Общий Банк Имен</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #111; color: white; padding: 40px; }
+    input, button { padding: 15px; margin: 10px; font-size: 18px; }
+    button { background: #00ff00; color: black; border: none; cursor: pointer; }
+    #list { margin: 30px auto; max-width: 500px; text-align: left; }
+    .item { background: #222; padding: 12px; margin: 8px 0; border-radius: 8px; font-size: 18px; }
+    #link { margin-top: 20px; word-break: break-all; background: #333; padding: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+
+  <h1>Общий Список Имен</h1>
+  
+  <input type="text" id="nameInput" placeholder="Введи своё имя" style="width: 300px;">
+  <button id="saveBtn">Добавить имя</button>
+
+  <div id="list"></div>
+
+  <div id="link">Текущая ссылка будет здесь...</div>
+
+  <script>
+    const listEl = document.getElementById('list');
+    const linkEl = document.getElementById('link');
+
+    // Загружаем список из URL (hash)
+    function loadList() {
+      listEl.innerHTML = '';
+      const hash = window.location.hash.substring(1); // убираем #
+      
+      if (hash) {
+        try {
+          const names = JSON.parse(decodeURIComponent(hash));
+          names.forEach(name => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.textContent = '👤 ' + name;
+            listEl.appendChild(div);
+          });
+        } catch(e) {}
+      }
+    }
+
+    // Добавляем новое имя
+    function addName() {
+      const input = document.getElementById('nameInput');
+      let name = input.value.trim();
+      
+      if (!name) return alert("Напиши имя!");
+
+      // Загружаем текущий список
+      let names = [];
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        try { names = JSON.parse(decodeURIComponent(hash)); } catch(e) {}
+      }
+
+      names.push(name);
+
+      // Обновляем URL
+      const newHash = encodeURIComponent(JSON.stringify(names));
+      window.location.hash = newHash;
+
+      input.value = '';
+      loadList();
+      updateLink();
+    }
+
+    function updateLink() {
+      linkEl.textContent = "Ссылка для друзей: " + window.location.href;
+    }
+
+    // Запуск
+    window.onload = () => {
+      loadList();
+      updateLink();
+      document.getElementById('saveBtn').addEventListener('click', addName);
+
+      // Обновляем при изменении URL (если друг добавил)
+      window.addEventListener('hashchange', () => {
+        loadList();
+        updateLink();
+      });
+    };
+  </script>
+
+</body>
+</html>
